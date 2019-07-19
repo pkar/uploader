@@ -18,7 +18,8 @@ With the upload_url, the client would then just upload, within 5 minutes,
 the file.
 
 To retrieve the file, the user would just use the api key and file id from
-the first step.
+the first step, following redirects since it will return an HTTP 301 with
+a Location header.
 
 
 ### Usage from bash
