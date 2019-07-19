@@ -1,0 +1,6 @@
+.DS_Store
+infra/lambda-apigw-iam/terraform.tfstate.backup
+infra/lambda-apigw-iam/terraform.tfstate
+infra/s3/terraform.tfstate
+.terraform
+output.txt

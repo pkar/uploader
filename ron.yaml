@@ -1,0 +1,27 @@
+envs:
+  - VERSION: 0.0.1-a19 # this could also be the git hash or tag, but for simplicity just manually set it for changes.
+  - S3_ARTIFACT_BUCKET_NAME: magic-uploader-artifact
+  - S3_FILES_BUCKET_NAME: magic-uploader-files
+  - URL: "https://<apigateway id>.execute-api.us-east-1.amazonaws.com/stage"
+targets:
+  deploy:
+    before:
+      - build:zip
+    after:
+      - infra:apply
+    cmd: |
+      aws s3 cp src/uploader.zip s3://${S3_ARTIFACT_BUCKET_NAME}/${VERSION}/uploader.zip
+  update_version:
+    description: NEW_VERSION=0.0.x ron t ron:update_version
+    cmd: |
+      ./bin/ron replace infra/lambda-apigw-iam/vars.tf $VERSION $NEW_VERSION
+      ./bin/ron replace ron.yaml $VERSION $NEW_VERSION
+  dry-run:
+    description: Using docker container test out the latest build of uploader.
+    before:
+      - build:zip
+    cmd: |
+        docker run --rm -v "$PWD/src":/var/task lambci/lambda:go1.x uploader '{"api_key": "c16f3b18-e43f-4216-b66e-62a26df8c683", "filepath": "bin/test.txt"}'
+  test-run:
+    cmd: |
+        URL=$URL ./bin/test.sh

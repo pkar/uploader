@@ -1,0 +1,35 @@
+envs:
+targets:
+  init:
+    description: Create the S3 and Lambda API Gateway infrastructure.
+    cmd: |
+        # aws s3api create-bucket --bucket=$S3_ARTIFACT_BUCKET_NAME --region=us-east-1
+        # aws s3api create-bucket --bucket=$S3_FILES_BUCKET_NAME --region=us-east-1
+        cd infra/s3
+        terraform init
+        terraform apply -auto-approve
+
+        cd -
+        cd infra/lambda-apigw-iam
+        terraform init
+        terraform apply -auto-approve
+
+        aws lambda invoke --region=us-east-1 --function-name=uploader output.txt && cat output.txt
+  destroy:
+    description: Destroy any terraform configuration changes
+    cmd: |
+      cd infra/lambda-apigw-iam
+      terraform destroy -var="artifact_zip_name=$VERSION/uploader.zip"
+
+      cd -
+      # TODO keep s3 files or remove
+      # cd infra/s3
+      # terraform destroy -var="artifact_zip_name=$VERSION/uploader.zip"
+  apply:
+    description: Apply any terraform configuration changes
+    cmd: |
+      cd infra/lambda-apigw-iam
+      # NOTE changes to api gateway require tainting and also cause downtime
+      # terraform taint aws_api_gateway_deployment.uploader
+      terraform apply -auto-approve -var="artifact_zip_name=$VERSION/uploader.zip"
+      aws lambda invoke --region=us-east-1 --function-name=uploader output.txt && cat output.txt

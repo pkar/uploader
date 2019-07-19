@@ -1,0 +1,10 @@
+envs:
+targets:
+  zip:
+    description: |
+      Bundle the go binary into a zip to be uploaded to S3 for the lambda artifact.
+    cmd: |
+      cd src
+      GOOS=linux GOARCH=amd64 go build -o uploader *.go
+      chmod 755 uploader
+      zip -j uploader.zip uploader
