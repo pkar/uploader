@@ -10,7 +10,9 @@ targets:
     after:
       - infra:apply
     cmd: |
-      aws s3 cp src/uploader.zip s3://${S3_ARTIFACT_BUCKET_NAME}/${VERSION}/uploader.zip
+      aws s3 ls s3://${S3_ARTIFACT_BUCKET_NAME}/${VERSION}/uploader.zip || \
+        $(echo s3://${S3_ARTIFACT_BUCKET_NAME}/${VERSION}/uploader.zip "does not exist, copying..." && \
+        aws s3 cp src/uploader.zip s3://${S3_ARTIFACT_BUCKET_NAME}/${VERSION}/uploader.zip)
   update_version:
     description: NEW_VERSION=0.0.x ron t ron:update_version
     cmd: |
