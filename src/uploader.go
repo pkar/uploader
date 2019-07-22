@@ -170,7 +170,7 @@ func put(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse,
 	// insert to db
 	// TODO use something other than md5 for name collisions
 	h := md5.New()
-	io.WriteString(h, event.Filepath)
+	io.WriteString(h, filepath.Join(username, event.Filepath))
 	// FIXME auto generate an id. Currently just using the filepath
 	// md5 allows for overwriting files with the same path.
 	now := time.Now()
